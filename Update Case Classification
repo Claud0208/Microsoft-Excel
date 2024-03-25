@@ -1,0 +1,57 @@
+Sub UpdateCaseClassification()
+
+    Dim answer As Integer
+    answer = MsgBox("Do you want to proceed?", vbYesNo, "Confirmation")
+    If answer = vbYes Then
+
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim i As Long
+    Dim labResultCol As Long
+    Dim caseClassificationCol As Long
+    
+     On Error Resume Next
+        Set ws = ThisWorkbook.Sheets("ABD")
+        On Error GoTo 0
+        If ws Is Nothing Then
+            MsgBox "No ABD sheet found.", vbCritical, "Error"
+            Exit Sub
+        End If
+    
+    Set ws = ThisWorkbook.Worksheets("ABD")
+    labResultCol = ws.Range("1:1").Find("Laboratory Result").Column
+    caseClassificationCol = ws.Range("1:1").Find("case classification").Column
+    lastRow = ws.Cells(ws.Rows.Count, labResultCol).End(xlUp).row
+    
+    For i = 2 To lastRow
+        If UCase(ws.Cells(i, labResultCol).Value) = "POSITIVE" Then
+            ws.Cells(i, caseClassificationCol).Value = "Confirmed"
+        ElseIf UCase(ws.Cells(i, labResultCol).Value) = "NEGATIVE" Then
+            ws.Cells(i, caseClassificationCol).Value = "Suspect"
+        ElseIf Trim(ws.Cells(i, labResultCol).Value) = "" Then
+            ws.Cells(i, caseClassificationCol).Value = "Suspect"
+        Else
+            ws.Cells(i, caseClassificationCol).Value = "Suspect"
+        End If
+    Next i
+    
+    
+        
+
+'HEADER FOR EDCS-IS
+    Sheets("EDCS_Format").Rows("1:1").Copy Destination:=Sheets("ABD").Rows("1:1")
+    Range("L8").Select
+
+Else
+        MsgBox "Operation cancelled."
+    End If
+    
+   Exit Sub
+    
+ErrorHandler:
+    MsgBox "Error: " & Err.Description, vbCritical, "Error"
+    End
+
+End Sub
+
+
