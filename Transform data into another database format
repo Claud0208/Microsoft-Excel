@@ -1,86 +1,424 @@
-Sub ExportABDData()
-On Error GoTo ErrorHandler
+Sub UpdatedTransferCode()
 
-Dim ws As Worksheet
-Dim filterRange As Range
-Dim filterCities As Variant
-Dim manilaAreas As Variant
-Dim headerRange As Range
-Dim cityRange As Range
-Dim city As Variant
-Dim i As Long
 
-'Set the filter cities
-filterCities = Array("CITY OF CALOOCAN", "CITY OF LAS PIÑAS", _
-"CITY OF MAKATI", "CITY OF MALABON", _
-"CITY OF MANDALUYONG", "CITY OF MARIKINA", _
-"CITY OF MUNTINLUPA", "CITY OF NAVOTAS", _
-"CITY OF PARAÑAQUE", "CITY OF PASAY", _
-"CITY OF PASIG", "CITY OF SAN JUAN", _
-"CITY OF TAGUIG", "CITY OF VALENZUELA", _
-"PATEROS", "QUEZON CITY", "MANILA")
+ Dim proceed As VbMsgBoxResult
+    answer = MsgBox("Do you want to proceed?", vbYesNo, "Confirmation")
+    If answer = vbYes Then
+    
+    On Error Resume Next
+    For Each sht In ThisWorkbook.Sheets
+    If sht.Name = "TransferredData" Then
+        sht.Cells.ClearContents
+    End If
+    Next
 
-manilaAreas = Array("BINONDO", "QUIAPO", "SAN NICOLAS", _
-"SANTA CRUZ", "SAMPALOC", "SAN MIGUEL", _
-"ERMITA", "INTRAMUROS", "MALATE", "PACO", _
-"PANDACAN", "PORT AREA", "SANTA ANA")
+    Set ws = ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count))
+    ws.Name = "TransferredData"
+    If Err.Number <> 0 Then
+    proceed = MsgBox("This Action will replace sheet named TransferredData. Do you want to proceed?", vbExclamation + vbYesNo)
+    If proceed = vbNo Then Exit Sub
+    End If
+    On Error GoTo 0
+      
+    t = Timer
+    
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+    Application.DisplayStatusBar = False
+    
+    Dim MDBSheet As Worksheet
+    Dim TransferredDataSheet As Worksheet
+    Dim lastRow As Long
+    
+    Set MDBSheet = ThisWorkbook.Sheets("Paste MDB Here")
+    Set TransferredDataSheet = ThisWorkbook.Sheets("TransferredData")
 
-'Set the worksheet to export
-Set ws = ThisWorkbook.Worksheets("ABD")
+      
+  
+    fullNameCol = Application.Match("FullName", MDBSheet.Rows(1), 0)
+    PATIENTNOCol = Application.Match("PatientNumber", MDBSheet.Rows(1), 0)
+    FIRSTNAMECol = Application.Match("FirstName", MDBSheet.Rows(1), 0)
+    FamilyNameCol = Application.Match("FamilyName", MDBSheet.Rows(1), 0)
+    AgeYearsCol = Application.Match("AgeYears", MDBSheet.Rows(1), 0)
+    SexCol = Application.Match("Sex", MDBSheet.Rows(1), 0)
+    dobCol = Application.Match("DOB", MDBSheet.Rows(1), 0)
+    RegionCol = Application.Match("Region", MDBSheet.Rows(1), 0)
+    ProvinceCol = Application.Match("Province", MDBSheet.Rows(1), 0)
+    MuncityCol = Application.Match("Muncity", MDBSheet.Rows(1), 0)
+    BarangayCol = Application.Match("Barangay", MDBSheet.Rows(1), 0)
+    StreetpurokCol = Application.Match("Streetpurok", MDBSheet.Rows(1), 0)
+    AdmittedCol = Application.Match("Admitted", MDBSheet.Rows(1), 0)
+    DAdmitCol = Application.Match("DAdmit", MDBSheet.Rows(1), 0)
+    DOnsetCol = Application.Match("DOnset", MDBSheet.Rows(1), 0)
+    OutcomeCol = Application.Match("Outcome", MDBSheet.Rows(1), 0)
+    DateDiedCol = Application.Match("DateDied", MDBSheet.Rows(1), 0)
+    CASECLASSCol = Application.Match("CASECLASS", MDBSheet.Rows(1), 0)
+    DateOfEntryCol = Application.Match("DateOfEntry", MDBSheet.Rows(1), 0)
+    epiidCol = Application.Match("EPIID", MDBSheet.Rows(1), 0)
+    NameOfDruCol = Application.Match("NameOfDru", MDBSheet.Rows(1), 0)
+    MorbidityMonthCol = Application.Match("MorbidityMonth", MDBSheet.Rows(1), 0)
+    MorbidityWeekCol = Application.Match("MorbidityWeek", MDBSheet.Rows(1), 0)
+    YearCol = Application.Match("Year", MDBSheet.Rows(1), 0)
+    
+    'dummyCol = Application.Match("dummy", MDBSheet.Rows(1), 0)
+      
+    lastRow = MDBSheet.Cells(MDBSheet.Rows.Count, fullNameCol).End(xlUp).row
+    
+    MDBSheet.Range(MDBSheet.Cells(1, PATIENTNOCol), MDBSheet.Cells(lastRow, PATIENTNOCol)).Copy Destination:=TransferredDataSheet.Range("C1")
+    MDBSheet.Range(MDBSheet.Cells(1, FIRSTNAMECol), MDBSheet.Cells(lastRow, FIRSTNAMECol)).Copy Destination:=TransferredDataSheet.Range("D1")
+    MDBSheet.Range(MDBSheet.Cells(1, FamilyNameCol), MDBSheet.Cells(lastRow, FamilyNameCol)).Copy Destination:=TransferredDataSheet.Range("F1")
+    MDBSheet.Range(MDBSheet.Cells(1, AgeYearsCol), MDBSheet.Cells(lastRow, AgeYearsCol)).Copy Destination:=TransferredDataSheet.Range("J1")
+    MDBSheet.Range(MDBSheet.Cells(1, SexCol), MDBSheet.Cells(lastRow, SexCol)).Copy Destination:=TransferredDataSheet.Range("H1")
+    MDBSheet.Range(MDBSheet.Cells(1, dobCol), MDBSheet.Cells(lastRow, dobCol)).Copy Destination:=TransferredDataSheet.Range("I1")
+    MDBSheet.Range(MDBSheet.Cells(1, RegionCol), MDBSheet.Cells(lastRow, RegionCol)).Copy Destination:=TransferredDataSheet.Range("K1")
+    MDBSheet.Range(MDBSheet.Cells(1, ProvinceCol), MDBSheet.Cells(lastRow, ProvinceCol)).Copy Destination:=TransferredDataSheet.Range("L1")
+    MDBSheet.Range(MDBSheet.Cells(1, MuncityCol), MDBSheet.Cells(lastRow, MuncityCol)).Copy Destination:=TransferredDataSheet.Range("M1")
+    MDBSheet.Range(MDBSheet.Cells(1, BarangayCol), MDBSheet.Cells(lastRow, BarangayCol)).Copy Destination:=TransferredDataSheet.Range("N1")
+    MDBSheet.Range(MDBSheet.Cells(1, StreetpurokCol), MDBSheet.Cells(lastRow, StreetpurokCol)).Copy Destination:=TransferredDataSheet.Range("O1")
+    MDBSheet.Range(MDBSheet.Cells(1, AdmittedCol), MDBSheet.Cells(lastRow, AdmittedCol)).Copy Destination:=TransferredDataSheet.Range("Z1")
+    MDBSheet.Range(MDBSheet.Cells(1, DAdmitCol), MDBSheet.Cells(lastRow, DAdmitCol)).Copy Destination:=TransferredDataSheet.Range("AA1")
+    MDBSheet.Range(MDBSheet.Cells(1, DOnsetCol), MDBSheet.Cells(lastRow, DOnsetCol)).Copy Destination:=TransferredDataSheet.Range("AB1")
+    MDBSheet.Range(MDBSheet.Cells(1, OutcomeCol), MDBSheet.Cells(lastRow, OutcomeCol)).Copy Destination:=TransferredDataSheet.Range("AC1")
+    MDBSheet.Range(MDBSheet.Cells(1, DateDiedCol), MDBSheet.Cells(lastRow, DateDiedCol)).Copy Destination:=TransferredDataSheet.Range("AD1")
+    MDBSheet.Range(MDBSheet.Cells(1, CASECLASSCol), MDBSheet.Cells(lastRow, CASECLASSCol)).Copy Destination:=TransferredDataSheet.Range("AE1")
+    MDBSheet.Range(MDBSheet.Cells(1, DateOfEntryCol), MDBSheet.Cells(lastRow, DateOfEntryCol)).Copy Destination:=TransferredDataSheet.Range("AG1")
+    MDBSheet.Range(MDBSheet.Cells(1, epiidCol), MDBSheet.Cells(lastRow, epiidCol)).Copy Destination:=TransferredDataSheet.Range("B1")
+    MDBSheet.Range(MDBSheet.Cells(1, NameOfDruCol), MDBSheet.Cells(lastRow, NameOfDruCol)).Copy Destination:=TransferredDataSheet.Range("U1")
+    MDBSheet.Range(MDBSheet.Cells(1, MorbidityMonthCol), MDBSheet.Cells(lastRow, MorbidityMonthCol)).Copy Destination:=TransferredDataSheet.Range("BC1")
+    MDBSheet.Range(MDBSheet.Cells(1, MorbidityWeekCol), MDBSheet.Cells(lastRow, MorbidityWeekCol)).Copy Destination:=TransferredDataSheet.Range("BD1")
+    MDBSheet.Range(MDBSheet.Cells(1, YearCol), MDBSheet.Cells(lastRow, YearCol)).Copy Destination:=TransferredDataSheet.Range("BE1")
+    
+    
+    'MDBSheet.Range(MDBSheet.Cells(1, dummyCol), MDBSheet.Cells(lastRow, dummyCol)).Copy Destination:=TransferredDataSheet.Range("D1")
+              
+'Dim lastRow As Long
+    TransferredDatalastRow = Sheets("TransferredData").Range("D" & Rows.Count).End(xlUp).row
+    Sheets("TransferredData").Activate
+    
+'REPLACE REGIONS IN PSGC FORMAT
+    Columns("K:K").Select
+    Selection.Replace What:="NCR", Replacement:="National Capital Region", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:= _
+        False, ReplaceFormat:=False
+    Selection.Replace What:="04A", Replacement:="CaLaBaRZon", LookAt:=xlPart _
+        , SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False
+    Selection.Replace What:="03", Replacement:="Central Luzon", LookAt:= _
+        xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False
+    Selection.Replace What:="3", Replacement:="Central Luzon", LookAt:= _
+        xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False
+        
+'FOR MANILA
+   For Manila = 2 To TransferredDatalastRow
+        If InStr(1, Range("O" & Manila).Value, "QUIAPO", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "QUIAPO"
+        ElseIf InStr(1, Range("O" & Manila).Value, "TONDO", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "TONDO I/II"
+        ElseIf InStr(1, Range("O" & Manila).Value, "BINONDO", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "BINODO"
+        ElseIf InStr(1, Range("O" & Manila).Value, "SAN NICOLAS", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "SAN NICOLAS"
+        ElseIf InStr(1, Range("O" & Manila).Value, "SANTA CRUZ", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "SANTA CRUZ"
+        ElseIf InStr(1, Range("O" & Manila).Value, "SAMPALOC", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "SAMPALOC"
+        ElseIf InStr(1, Range("O" & Manila).Value, "SAN MIGUEL", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "SAN MIGUEL"
+        ElseIf InStr(1, Range("O" & Manila).Value, "ERMITA", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "ERMITA"
+        ElseIf InStr(1, Range("O" & Manila).Value, "INTRAMUROS", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "INTRAMUROS"
+        ElseIf InStr(1, Range("O" & Manila).Value, "MALATE", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "MALATE"
+        ElseIf InStr(1, Range("O" & Manila).Value, "PACO", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "PACO"
+        ElseIf InStr(1, Range("O" & Manila).Value, "PANDACAN", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "PANDACAN"
+        ElseIf InStr(1, Range("O" & Manila).Value, "PORT AREA", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "PORT AREA"
+        ElseIf InStr(1, Range("O" & Manila).Value, "SANTA ANA", vbTextCompare) > 0 Then
+        Range("M" & Manila).Value = "SANTA ANA"
+        End If
+          Next Manila
+        
+'REPLACE CITIES INTO PSGC FORMAT (NCR ONLY)
+    Columns("M:M").Select
+    Selection.Replace What:="CALOOCAN CITY", Replacement:="CITY OF CALOOCAN", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:= _
+        False, ReplaceFormat:=False
+    Selection.Replace What:="LAS PIÑAS CITY", Replacement:="CITY OF LAS PIÑAS" _
+        , LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat _
+        :=False, ReplaceFormat:=False
+    Selection.Replace What:="MAKATI CITY", Replacement:="CITY OF MAKATI", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:= _
+        False, ReplaceFormat:=False
+    Selection.Replace What:="MALABON CITY", Replacement:="CITY OF MALABON", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:= _
+        False, ReplaceFormat:=False
+    Selection.Replace What:="MANDALUYONG CITY", Replacement:="CITY OF MANDALUYONG", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:= _
+        False, SearchFormat:=False, ReplaceFormat:=False
+    Selection.Replace What:="MARIKINA CITY", Replacement:="CITY OF MARIKINA", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:= _
+        False, ReplaceFormat:=False
+    Selection.Replace What:="MUNTINLUPA CITY", Replacement:="CITY OF MUNTINLUPA", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:= _
+        False, SearchFormat:=False, ReplaceFormat:=False
+    Selection.Replace What:="NAVOTAS", Replacement:="CITY OF NAVOTAS", LookAt _
+        :=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False
+    Selection.Replace What:="NAVOTAS CITY", Replacement:="CITY OF NAVOTAS", LookAt _
+        :=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False
+    Selection.Replace What:="PARAÑAQUE CITY", Replacement:="CITY OF PARAÑAQUE", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat _
+        :=False, ReplaceFormat:=False
+    Selection.Replace What:="PASAY CITY", Replacement:="CITY OF PASAY", LookAt _
+        :=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False
+    Selection.Replace What:="PASIG CITY", Replacement:="CITY OF PASIG", LookAt _
+        :=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False
+    Selection.Replace What:="SAN JUAN", Replacement:="CITY OF SAN JUAN", LookAt _
+        :=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False
+    Selection.Replace What:="SAN JUAN CITY", Replacement:="CITY OF SAN JUAN", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:= _
+        False, ReplaceFormat:=False
+    Selection.Replace What:="TAGUIG CITY", Replacement:="CITY OF TAGUIG", _
+        LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:= _
+        False, ReplaceFormat:=False
+    Selection.Replace What:="VALENZUELA CITY", Replacement:= _
+        "CITY OF VALENZUELA", LookAt:=xlPart, SearchOrder:=xlByRows, MatchCase:= _
+        False, SearchFormat:=False, ReplaceFormat:=False
+        
+ 'PROV PSGC fixer
+ For i = 1 To lastRow
+        If Cells(i, "M").Value = "TONDO I/II" _
+            Or Cells(i, "M").Value = "BINONDO" _
+            Or Cells(i, "M").Value = "QUIAPO" _
+            Or Cells(i, "M").Value = "SAN NICOLAS" _
+            Or Cells(i, "M").Value = "SANTA CRUZ" _
+            Or Cells(i, "M").Value = "SAMPALOC" _
+            Or Cells(i, "M").Value = "SAN MIGUEL" _
+            Or Cells(i, "M").Value = "ERMITA" _
+            Or Cells(i, "M").Value = "INTRAMUROS" _
+            Or Cells(i, "M").Value = "MALATE" _
+            Or Cells(i, "M").Value = "PACO" _
+            Or Cells(i, "M").Value = "PANDACAN" _
+            Or Cells(i, "M").Value = "MANILA" _
+            Or Cells(i, "M").Value = "PORT AREA" _
+            Or Cells(i, "M").Value = "SANTA ANA" Then
+            
+            Cells(i, "L").Value = "NCR, CITY OF MANILA, FIRST DISTRICT (Not a Province)"
+            
+        ElseIf Cells(i, "M").Value = "CITY OF MANDALUYONG" _
+            Or Cells(i, "M").Value = "CITY OF MARIKINA" _
+            Or Cells(i, "M").Value = "CITY OF PASIG" _
+            Or Cells(i, "M").Value = "QUEZON CITY" _
+            Or Cells(i, "M").Value = "CITY OF SAN JUAN" Then
+            
+            Cells(i, "L").Value = "NCR, SECOND DISTRICT (Not a Province)"
+            
+        ElseIf Cells(i, "M").Value = "CITY OF CALOOCAN" _
+            Or Cells(i, "M").Value = "CITY OF MALABON" _
+            Or Cells(i, "M").Value = "CITY OF NAVOTAS" _
+            Or Cells(i, "M").Value = "CITY OF VALENZUELA" Then
+            
+            Cells(i, "L").Value = "NCR, THIRD DISTRICT (Not a Province)"
+            
+        ElseIf Cells(i, "M").Value = "CITY OF LAS PIÑAS" _
+            Or Cells(i, "M").Value = "CITY OF MAKATI" _
+            Or Cells(i, "M").Value = "CITY OF MUNTINLUPA" _
+            Or Cells(i, "M").Value = "CITY OF PARAÑAQUE" _
+            Or Cells(i, "M").Value = "CITY OF PASAY" _
+            Or Cells(i, "M").Value = "PATEROS" _
+            Or Cells(i, "M").Value = "CITY OF TAGUIG" Then
+            
+            Cells(i, "L").Value = "NCR, FOURTH DISTRICT (Not a Province)"
+            
+        End If
+    Next i
 
-Dim fso As Object
-Set fso = CreateObject("Scripting.FileSystemObject")
-Dim folderPath As String
-folderPath = CreateObject("WScript.Shell").SpecialFolders("Desktop") & "\ABD from EDCS-IS"
-If Not fso.FolderExists(folderPath) Then
-fso.CreateFolder folderPath
+'COPIES CURRENT ADDRESS TO PERMANENT ADDRESS
+    Sheets("TransferredData").Select
+    Columns("K:O").Select
+    Application.CutCopyMode = False
+    Selection.Copy
+    Sheets("TransferredData").Select
+    Columns("P:T").Select
+    ActiveSheet.Paste
+
+
+'DATE OF CONSULTATION FILLER AND CASE CLASSIFICATION ALIGNER
+    Dim CFCC As Long
+    
+    For CFCC = 2 To lastRow
+        If Range("Z" & CFCC).Value = 0 Then
+            Range("W" & CFCC).Value = 1
+        Else
+            Range("W" & CFCC).Value = 0
+        End If
+        
+        If Left(Range("AC" & CFCC).Value, 1) Like "[a-zA-Z]" Then
+            Range("AC" & CFCC).Value = "Alive"
+        End If
+   
+        Select Case Left(Range("AE" & CFCC).Value, 1)
+            Case "S"
+                Range("AE" & CFCC).Value = "Suspect"
+            Case "C"
+                Range("AE" & CFCC).Value = "Confirmed"
+            Case "P"
+                Range("AE" & CFCC).Value = "Probable"
+        End Select
+    Next CFCC
+   
+   
+'REPLACE INTEGERS INTO YES OR NO
+  Dim YN As Integer
+    
+    For YN = 2 To lastRow
+        If Range("W" & YN).Value = 0 Then
+            Range("W" & YN).Value = "No"
+        
+        ElseIf Range("W" & YN).Value = 1 Then
+            Range("W" & YN).Value = "Yes"
+        End If
+        
+        If Range("Z" & YN).Value = 0 Then
+            Range("Z" & YN).Value = "No"
+        
+        ElseIf Range("Z" & YN).Value = 1 Then
+            Range("Z" & YN).Value = "Yes"
+        End If
+        
+    Next YN
+    
+'CASE CODE
+    Dim cc As Long
+    For cc = 2 To lastRow
+        If Not IsEmpty(Cells(cc, "D")) Then
+            Cells(cc, "AI") = "ABD"
+        End If
+    Next cc
+
+'DATE OF CONSULTATION FILLER
+    
+    For i = 2 To lastRow
+        If Sheets("TransferredData").Cells(i, "W").Value = "Yes" Then
+            Sheets("TransferredData").Cells(i, "AA").Copy Destination:=Sheets("TransferredData").Cells(i, "X")
+            Sheets("TransferredData").Cells(i, "U").Copy Destination:=Sheets("TransferredData").Cells(i, "Y")
+        End If
+    Next i
+
+
+    
+'GENDER REPLACER
+    Dim cell3 As Range
+    For Each cell3 In Range("H2:H" & lastRow)
+        If Left(cell3.Value, 1) = "F" Then
+            cell3.Value = "Female"
+        ElseIf Left(cell3.Value, 1) = "M" Then
+            cell3.Value = "Male"
+        End If
+    Next cell3
+
+'DATE FORMAT ALIGNER
+    Dim r As Range
+    Dim DateFormat As String
+    
+    DateFormat = "mm/dd/yyyy"
+    
+    For Each r In ActiveSheet.UsedRange
+        If IsDate(r.Value) Then
+            r.NumberFormat = DateFormat
+        End If
+    Next r
+    
+'Morbidity Week & Month Copy
+    Dim ws1 As Worksheet, ws2 As Worksheet
+    Set ws1 = ThisWorkbook.Sheets("Paste MDB here")
+    Set ws2 = ThisWorkbook.Sheets("TransferredData")
+    
+    ws1.Range("AD:AE").Copy ws2.Range("BC:BD")
+          
+    
+'Laboratory
+    Dim sourceSheet As Worksheet
+    Dim targetSheet As Worksheet
+    
+    Set sourceSheet = ThisWorkbook.Worksheets("Paste MDB here")
+    Set targetSheet = ThisWorkbook.Worksheets("TransferredData")
+    lastRow = sourceSheet.Cells(Rows.Count, "W").End(xlUp).row
+    
+    For i = 2 To lastRow
+        If sourceSheet.Cells(i, "W").Value = "Positive" Or sourceSheet.Cells(i, "W").Value = "Negative" Then
+            If sourceSheet.Cells(i, "W").Value = "Positive" Then
+                targetSheet.Cells(i, "BK").Value = "Positive"
+            ElseIf sourceSheet.Cells(i, "W").Value = "Negative" Then
+                targetSheet.Cells(i, "BK").Value = "Negative"
+            End If
+            targetSheet.Cells(i, "BM").Value = sourceSheet.Cells(i, "X").Value
+            If sourceSheet.Cells(i, "W").Value = "Positive" Or sourceSheet.Cells(i, "W").Value = "Negative" Then
+                targetSheet.Cells(i, "BH").Value = "Stool"
+                targetSheet.Cells(i, "BL").Value = "Culture"
+            End If
+        End If
+    Next i
+              
+              
+              
+              
+              
+'CHANGE HEIGHT OF THE ROWS
+    For rh = 2 To lastRow
+        Rows(rh).RowHeight = 15
+    Next rh
+    
+'Auto Fit Columns
+    Sheets("TransferredData").Columns.AutoFit
+    
+'Clear Row Formats
+    Set TransferredDataSheet = ThisWorkbook.Worksheets("TransferredData")
+    
+    With TransferredDataSheet.Rows("2:" & TransferredDataSheet.Rows.Count)
+        .Interior.ColorIndex = xlNone
+        .Font.Name = "Calibri"
+        .Font.Size = 11
+        .Borders.LineStyle = xlNone
+        .Font.FontStyle = "Regular"
+        .Font.ColorIndex = xlAutomatic
+    TransferredDataSheet.Cells.Replace What:="Y", Replacement:="Yes", LookAt:=xlWhole, MatchCase:=False
+    TransferredDataSheet.Cells.Replace What:="N", Replacement:="No", LookAt:=xlWhole, MatchCase:=False
+    Sheets("TransferredData").Columns.AutoFit
+    End With
+
+    
+'HEADER FOR EDCS-IS
+    Sheets("EDCS_Format").Rows("1:1").Copy Destination:=Sheets("TransferredData").Rows("1:1")
+    Range("L8").Select
+    
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
+    Application.DisplayStatusBar = True
+
+    'Clear the clipboard
+    Application.CutCopyMode = False
+    
+    MsgBox "Data transfer complete.", vbInformation, "TransferData Macro"
+
+Debug.Print "UpdatedTransferCode: " & Timer - t & " sec"
+
+Else
+        MsgBox "Operation cancelled."
+
+
 End If
-
-'Set the range to filter
-Set filterRange = ws.Range("A1").CurrentRegion
-
-'Loop through each city in the filter list
-For Each city In filterCities
-'Apply the filter
-filterRange.AutoFilter Field:=18, Criteria1:=city
-
-
-'Check if there are any visible rows to export
-If filterRange.Rows.Count > 1 Then
-    'Set the range to copy, including the header row
-    Set headerRange = ws.Range("A1").CurrentRegion
-    Set headerRange = headerRange.Resize(headerRange.Rows.Count - 1).Offset(1)
-
-    'Create a new workbook for each city
-    Workbooks.Add
-    ActiveWorkbook.SaveAs fileName:=folderPath & "\" & city & " ABD Data.xlsx"
-    Set cityRange = ActiveSheet.Range("A1")
-    ActiveSheet.Name = "ABD"
-
-    'Add header row with origin sheet header
-    ws.Rows(1).Copy cityRange
-    i = 1
-    headerRange.Copy cityRange.Offset(i, 0)
-
-    'Copy filtered data to the new workbook
-    filterRange.Offset(1, 0).Resize(filterRange.Rows.Count - 1, filterRange.Columns.Count).Copy cityRange.Offset(1, 0)
-
-    'Turn off the filter
-    filterRange.AutoFilter
-
-    'Adjust the column widths
-    cityRange.CurrentRegion.Columns.AutoFit
-
-    'Save and close the new workbook
-    ActiveWorkbook.Save
-    ActiveWorkbook.Close
-End If
-
-Next city
-
-Exit Sub
-
-ErrorHandler:
-MsgBox "An error occurred: " & Err.Description
-Exit Sub
+    
 End Sub
+
