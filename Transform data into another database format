@@ -1,0 +1,86 @@
+Sub ExportABDData()
+On Error GoTo ErrorHandler
+
+Dim ws As Worksheet
+Dim filterRange As Range
+Dim filterCities As Variant
+Dim manilaAreas As Variant
+Dim headerRange As Range
+Dim cityRange As Range
+Dim city As Variant
+Dim i As Long
+
+'Set the filter cities
+filterCities = Array("CITY OF CALOOCAN", "CITY OF LAS PIÑAS", _
+"CITY OF MAKATI", "CITY OF MALABON", _
+"CITY OF MANDALUYONG", "CITY OF MARIKINA", _
+"CITY OF MUNTINLUPA", "CITY OF NAVOTAS", _
+"CITY OF PARAÑAQUE", "CITY OF PASAY", _
+"CITY OF PASIG", "CITY OF SAN JUAN", _
+"CITY OF TAGUIG", "CITY OF VALENZUELA", _
+"PATEROS", "QUEZON CITY", "MANILA")
+
+manilaAreas = Array("BINONDO", "QUIAPO", "SAN NICOLAS", _
+"SANTA CRUZ", "SAMPALOC", "SAN MIGUEL", _
+"ERMITA", "INTRAMUROS", "MALATE", "PACO", _
+"PANDACAN", "PORT AREA", "SANTA ANA")
+
+'Set the worksheet to export
+Set ws = ThisWorkbook.Worksheets("ABD")
+
+Dim fso As Object
+Set fso = CreateObject("Scripting.FileSystemObject")
+Dim folderPath As String
+folderPath = CreateObject("WScript.Shell").SpecialFolders("Desktop") & "\ABD from EDCS-IS"
+If Not fso.FolderExists(folderPath) Then
+fso.CreateFolder folderPath
+End If
+
+'Set the range to filter
+Set filterRange = ws.Range("A1").CurrentRegion
+
+'Loop through each city in the filter list
+For Each city In filterCities
+'Apply the filter
+filterRange.AutoFilter Field:=18, Criteria1:=city
+
+
+'Check if there are any visible rows to export
+If filterRange.Rows.Count > 1 Then
+    'Set the range to copy, including the header row
+    Set headerRange = ws.Range("A1").CurrentRegion
+    Set headerRange = headerRange.Resize(headerRange.Rows.Count - 1).Offset(1)
+
+    'Create a new workbook for each city
+    Workbooks.Add
+    ActiveWorkbook.SaveAs fileName:=folderPath & "\" & city & " ABD Data.xlsx"
+    Set cityRange = ActiveSheet.Range("A1")
+    ActiveSheet.Name = "ABD"
+
+    'Add header row with origin sheet header
+    ws.Rows(1).Copy cityRange
+    i = 1
+    headerRange.Copy cityRange.Offset(i, 0)
+
+    'Copy filtered data to the new workbook
+    filterRange.Offset(1, 0).Resize(filterRange.Rows.Count - 1, filterRange.Columns.Count).Copy cityRange.Offset(1, 0)
+
+    'Turn off the filter
+    filterRange.AutoFilter
+
+    'Adjust the column widths
+    cityRange.CurrentRegion.Columns.AutoFit
+
+    'Save and close the new workbook
+    ActiveWorkbook.Save
+    ActiveWorkbook.Close
+End If
+
+Next city
+
+Exit Sub
+
+ErrorHandler:
+MsgBox "An error occurred: " & Err.Description
+Exit Sub
+End Sub
