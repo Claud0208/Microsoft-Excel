@@ -1,0 +1,89 @@
+Sub LabUpdater()
+
+    Dim answer As Integer
+    answer = MsgBox("Do you want to proceed?", vbYesNo, "Confirmation")
+    If answer = vbYes Then
+    
+    Dim ws2 As Worksheet
+      
+    On Error Resume Next
+    Set ws2 = ThisWorkbook.Sheets("ABD")
+    On Error GoTo 0
+    If ws2 Is Nothing Then
+    MsgBox "No ABD sheet found.", vbCritical, "Error"
+    Exit Sub
+    End If
+          
+    Dim pasteLabHere As Worksheet
+    Dim ABD As Worksheet
+    Dim lastRowPasteLabHere As Long
+    Dim lastRowABD As Long
+    Dim i As Long
+    Dim j As Long
+    Dim matchValue As String
+    
+    Set pasteLabHere = Worksheets("Paste Lab here")
+    Set ABD = Worksheets("ABD")
+    
+    lastRowPasteLabHere = pasteLabHere.Cells(Rows.Count, "D").End(xlUp).row
+    lastRowABD = ABD.Cells(Rows.Count, "B").End(xlUp).row
+
+    For i = 2 To lastRowPasteLabHere
+    matchValue = pasteLabHere.Cells(i, "D").Value
+    For j = 2 To lastRowABD
+        If matchValue = ABD.Cells(j, "B").Value Then
+            If Len(ABD.Cells(j, "BF").Value) > 0 Then
+                ABD.Cells(j, "BF").Value = ABD.Cells(j, "BF").Value & ";"
+            End If
+            ABD.Cells(j, "BF").Value = ABD.Cells(j, "BF").Value & pasteLabHere.Cells(i, "B").Value
+
+            If Len(ABD.Cells(j, "BM").Value) > 0 Then
+                ABD.Cells(j, "BG").Value = ABD.Cells(j, "BG").Value & ";"
+            End If
+            ABD.Cells(j, "BG").Value = ABD.Cells(j, "BG").Value & pasteLabHere.Cells(i, "X").Value
+
+            If Len(ABD.Cells(j, "BH").Value) > 0 Then
+                ABD.Cells(j, "BH").Value = ABD.Cells(j, "BH").Value & ";"
+            End If
+            ABD.Cells(j, "BH").Value = ABD.Cells(j, "BH").Value & pasteLabHere.Cells(i, "Y").Value
+
+            If Len(ABD.Cells(j, "BI").Value) > 0 Then
+                ABD.Cells(j, "BI").Value = ABD.Cells(j, "BI").Value & ";"
+            End If
+            ABD.Cells(j, "BI").Value = ABD.Cells(j, "BI").Value & pasteLabHere.Cells(i, "Z").Value
+
+            If Len(ABD.Cells(j, "BJ").Value) > 0 Then
+                ABD.Cells(j, "BJ").Value = ABD.Cells(j, "BJ").Value & ";"
+            End If
+            ABD.Cells(j, "BJ").Value = ABD.Cells(j, "BJ").Value & pasteLabHere.Cells(i, "AA").Value
+
+            If Len(ABD.Cells(j, "BK").Value) > 0 Then
+                ABD.Cells(j, "BK").Value = ABD.Cells(j, "BK").Value & ";"
+            End If
+            ABD.Cells(j, "BK").Value = ABD.Cells(j, "BK").Value & pasteLabHere.Cells(i, "AB").Value
+
+            If Len(ABD.Cells(j, "BL").Value) > 0 Then
+                ABD.Cells(j, "BL").Value = ABD.Cells(j, "BL").Value & ";"
+            End If
+            ABD.Cells(j, "BL").Value = ABD.Cells(j, "BL").Value & pasteLabHere.Cells(i, "AC").Value
+
+            If Len(ABD.Cells(j, "BM").Value) > 0 Then
+                ABD.Cells(j, "BM").Value = ABD.Cells(j, "BM").Value & ";"
+            End If
+            ABD.Cells(j, "BM").Value = ABD.Cells(j, "BM").Value & pasteLabHere.Cells(i, "AD").Value
+        End If
+    Next j
+Next i
+
+'HEADER FOR EDCS-IS
+    Sheets("EDCS_Format").Rows("1:1").Copy Destination:=Sheets("ABD").Rows("1:1")
+    Range("L8").Select
+
+Else
+        MsgBox "Operation cancelled."
+    End If
+
+End Sub
+
+
+
