@@ -1,0 +1,61 @@
+Sub Morbidity_Updater()
+
+    Dim answer As VbMsgBoxResult
+    answer = MsgBox("Do you want to proceed?", vbYesNo, "Confirmation")
+    If answer = vbYes Then
+        Dim lastRow As Long
+        Dim i As Long, j As Long
+        Dim startDate As Date, endDate As Date
+        Dim startDate2 As Date, endDate2 As Date
+        Dim ws1 As Worksheet, ws2 As Worksheet
+        
+        On Error Resume Next
+        Set ws2 = ThisWorkbook.Sheets("ABD")
+        On Error GoTo 0
+        If ws2 Is Nothing Then
+            MsgBox "No ABD sheet found.", vbCritical, "Error"
+            Exit Sub
+        End If
+        
+        Set ws1 = ThisWorkbook.Sheets("Paste MDB here")
+        Set ws2 = ThisWorkbook.Sheets("ABD")
+        
+        'Morbidity Week & Month Updater
+        lastRow = ws2.Cells(ws2.Rows.Count, "AB").End(xlUp).row
+        For i = 2 To lastRow
+            If Year(ws2.Cells(i, "AB")) = 2023 Then
+                For j = 1 To 52
+                    startDate = DateSerial(2023, 1, (j - 1) * 7 + 1)
+                    endDate = DateSerial(2023, 1, j * 7)
+                    If ws2.Cells(i, "AB").Value >= startDate And ws2.Cells(i, "AB").Value <= endDate Then
+                        ws2.Cells(i, "BD").Value = j
+                    
+                    End If
+                Next j
+                For j = 1 To 12
+                    startDate2 = DateSerial(2023, j, 1)
+                    endDate2 = DateSerial(2023, j + 1, 1) - 1
+                    If ws2.Cells(i, "AB").Value >= startDate2 And ws2.Cells(i, "AB").Value <= endDate2 Then
+                        ws2.Cells(i, "BC").Value = j
+                     
+                    End If
+                Next j
+            End If
+        Next i
+        
+        'Year
+        lastRow = ws2.Cells(ws2.Rows.Count, "AB").End(xlUp).row
+        For i = 2 To lastRow
+            ws2.Cells(i, "BE").Value = Year(ws2.Cells(i, "AB").Value)
+        Next i
+        
+'HEADER FOR EDCS-IS
+    Sheets("EDCS_Format").Rows("1:1").Copy Destination:=Sheets("ABD").Rows("1:1")
+    Range("L8").Select
+        
+    Else
+        MsgBox "Operation cancelled."
+    End If
+
+End Sub
+
